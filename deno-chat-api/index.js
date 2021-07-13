@@ -6,5 +6,24 @@ app.use((ctx) => {
   ctx.response.body = "Hello World!";
 });
 
+const messages = [];
+
+const router = new Router();
+router
+  .get("/", (context) => {
+    context.response.body = "Welcome to the chat!";
+  })
+  .get("/messages", (context) => {
+    context.response.body = messages;
+  })
+  .post("/messages", async (context) => {
+    const message = await context.request.body().value;
+    messages.push(message);
+    context.response.body = messages;
+  });
+
+const app = new Application();
+app.use(router.routes());
+app.use(router.allowedMethods());
 
 addEventListener("fetch", app.fetchEventHandler());
