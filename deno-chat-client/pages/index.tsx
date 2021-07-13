@@ -6,12 +6,25 @@ interface Message {
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [text, setText] = useState("");
 
   const getMessages = useCallback(async () => {
     const res = await fetch('https://denissb-deno-chat-api.deno.dev/messages');
     const data = await res.json();
     setMessages(data);
   }, [])
+
+  const onSendMessage = useCallback(async () => {
+    await fetch('https://denissb-deno-chat-api.deno.dev/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({text}),
+    });
+    setText("");
+    getMessages();
+  }, [text]);
 
   useEffect(() => {
     getMessages();
@@ -20,6 +33,8 @@ export default function Home() {
   return (
     <div>
       <pre>{JSON.stringify(messages)}</pre>
+      <input type="text" value={text} onChange={(evt) => setText(evt.target.value)} />
+      <button onClick={onSendMessage}>Send message!</button>
     </div>
   );
 }
